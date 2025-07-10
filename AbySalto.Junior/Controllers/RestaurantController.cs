@@ -41,5 +41,44 @@ namespace AbySalto.Junior.Controllers
 
             return order == null ? NotFound() : Ok(order);
         }
+
+        [HttpGet("order/{id}/total")]
+        public async Task<ActionResult<decimal>> GetTotalAmount(int id)
+        {
+            var order = await _context.Orders
+                .AsNoTracking()
+                .Include(o => o.Items)
+                .FirstOrDefaultAsync(o => o.Id == id);
+
+            if (order == null)
+                return NotFound();
+
+            return Ok(order.TotalAmount);
+        }
+
+        [HttpGet("allOrders")]
+        public async Task<ActionResult<List<Order>>> GetAllOrders()
+        {
+            var orders = await _context.Orders
+                .Include(o => o.Items)
+                .AsNoTracking()
+                .ToListAsync();
+
+            return Ok(orders);
+        }
+
+        [HttpGet("allOrders/sortedByTotal")]
+        public async Task<ActionResult<List<Order>>> GetOrdersSortedByTotal()
+        {
+            var orders = await _context.Orders
+                .Include(o => o.Items)
+                .AsNoTracking()
+                .ToListAsync();
+
+            var sorted = orders.OrderByDescending(o => o.TotalAmount).ToList();
+            return Ok(sorted);
+
+        }
+
     }
 }
