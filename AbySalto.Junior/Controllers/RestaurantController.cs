@@ -116,7 +116,7 @@ namespace AbySalto.Junior.Controllers
         [HttpPatch("order/{id}/status")]
         public async Task<IActionResult> UpdateStatus(int id, [FromBody] string newStatus)
         {
-            if (!Enum.TryParse<OrderStatus>(newStatus, out var status))
+            if (!Enum.TryParse<OrderStatus>(newStatus.Trim().Replace(" ", ""), ignoreCase: true, out var status))
                 return BadRequest("Nevažeći status.");
 
             var order = await _context.Orders.FindAsync(id);
@@ -126,7 +126,7 @@ namespace AbySalto.Junior.Controllers
             order.Status = status;
             await _context.SaveChangesAsync();
 
-            var message = $"Status narudžbe #{order.Id} je uspješno promijenjen na '{newStatus}'.";
+            var message = $"Status narudžbe #{order.Id} je uspješno promijenjen na '{status}'.";
 
             return Ok(message);
         }
