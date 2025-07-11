@@ -15,7 +15,9 @@ namespace AbySalto.Junior
             builder.Services.AddControllers()
                 .AddJsonOptions(options =>
                 {
+                    // Enum se serijalizira kao string
                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                    // Ignorira ciklicne reference prilikom serijalizacije objekata
                     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
                 });
 
@@ -25,6 +27,11 @@ namespace AbySalto.Junior
             builder.Services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Restaurant", Version = "v1" });
+
+                // Ucitaj XML komentare iz generirane dokumentacije
+                var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
             });
 
             builder.Services.AddDbContext<IApplicationDbContext, ApplicationDbContext>(options =>
